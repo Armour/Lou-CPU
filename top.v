@@ -79,9 +79,9 @@ module top (
 
     pc p(btn_out[0], rst, pc_new[10:2], pc_0[10:2]);
     pc4 p4(pc_0[10:2], pc_4[10:2]);
-    inst in(pc_0[10:2], clk, inst);
+    inst in(pc_0[10:2], inst);
 
-    add32 add(pc_4, {out_ext32[29:0], 2'b00}, pc_4_j);
+    adder32 add(pc_4, {out_ext32[29:0], 2'b00}, pc_4_j);
 
     control sc(inst[31:26], ALUop, RegDst, RegWrite, Branch, Jump, MemtoReg, MemRead, MemWrite, ALUsrc, rst);
 
@@ -93,11 +93,11 @@ module top (
 
     pbdebounce pb(clk, btn, btn_out);
 
-    mux2x1 sm0(inst[20:16], inst[15:11], {5{RegDst}}, i_wreg); //W1
-    mux2x1 sm1(o_rdata2, out_ext32, {32{ALUsrc}}, alu_op2); //ALU operand2
-    mux2x1 sm2(alu_result, Dmdata, {32{MemtoReg}}, i_wdata); //Wdata
-    mux2x1 sm3(pc_4, pc_4_j, {32{brh_ctr}}, j_brh_0); //jump 0
-    mux2x1 sm4(j_brh_0, {pc_4[31:28], inst[25:0], 2'b00}, {32{Jump}}, pc_new); //back to pc
+    mux2x1 #(5) sm0(inst[20:16], inst[15:11], RegDst, i_wreg); //W1
+    mux2x1 sm1(o_rdata2, out_ext32, ALUsrc, alu_op2); //ALU operand2
+    mux2x1 sm2(alu_result, Dmdata, MemtoReg, i_wdata); //Wdata
+    mux2x1 sm3(pc_4, pc_4_j, brh_ctr, j_brh_0); //jump 0
+    mux2x1 sm4(j_brh_0, {pc_4[31:28], inst[25:0], 2'b00}, Jump, pc_new); //back to pc
 
     extend ext(inst[15:0], out_ext32); //sign extended
 

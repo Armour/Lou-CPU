@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module or_32(result, num1, num2);
+module or32(result, num1, num2);
     input [31:0]num1, num2;
     output [31:0]result;
 

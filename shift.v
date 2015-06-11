@@ -23,6 +23,6 @@ module shift(
         output [31:0]out
     );
 
-    assign out = {in[29:0], 2b'0};
+    assign out = {in[29:0], 2'b0};
 
 endmodule

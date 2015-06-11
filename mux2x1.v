@@ -18,16 +18,11 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-module mux2x1(
-        input A,
-        input B,
-        input ctrl,
-        output S
-    );
-
-    wire ta, tb;
-    and(ta, A, ~ctrl);
-    and(ta, B, ctrl);
-    or(S, ta, tb);
+module mux2x1(A, B, Ctrl, S);
+	parameter N=32;
+	input wire [N-1:0] A, B;
+	input wire Ctrl;
+	output wire [N-1:0] S;
+	assign S = Ctrl? B : A;
 
 endmodule

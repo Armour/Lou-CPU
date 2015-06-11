@@ -28,11 +28,10 @@ module ALUnit(Adat, Bdat, ALUoper, Result, zero, carryout, overflow);
     output zero, carryout, overflow;
 
     wire slt, caryt, overf;
-    wire[31:0] andt, orxt, addsub; //与、或、加减结果
-
+    wire[31:0] andt, orxt, addsub; //与、或、加减结�
     and32 an1(andt, Adat, Bdat); //AND
     or32 or1(orxt, Adat, Bdat); //OR
-    adder32 a32a(Adat, Bdat, ALUoper[2], ALUoper[2], addsub, caryt, overf); //Add/Sub
+    adder32 add32(Adat, Bdat, ALUoper[2], ALUoper[2], addsub, caryt, overf); //Add/Sub
     xor(cyt, caryt, ALUoper[2]); //SUB
     xor(slt, overf, addsub[31]); //SLT
 

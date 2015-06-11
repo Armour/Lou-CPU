@@ -41,7 +41,7 @@ module regFile(
 
     always @(Wdat) begin
         if (RegWrite) begin
-            iRegf[regW] <= (regW == 5'b00000) ? 32'h0 : Wdat;
+            iRegf[regW] <= (regW == 5'b00000) ? 32'b0 : Wdat;
         end
     end
 

@@ -20,11 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module pc(btn, rst, i_pc, o_pc);
+    parameter N = 9;
     input wire btn, rst;
     input wire[N-1:0] i_pc;
     output wire[N-1:0] o_pc;
-
-    parameter N = 9;
+	 
     reg[N-1:0] t_pc;
     assign o_pc = rst ? {N{1'b1}}: t_pc;
     always @(posedge btn) begin

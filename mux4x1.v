@@ -25,10 +25,10 @@ module mux4x1(
         input [31:0]A,
         input [31:0]B,
         input [31:0]C,
-        input [31:0]D,
+        input [31:0]D
     );
 
-    wire [31:0]ta, [31:0]tb, [31:0]tc, [31:0]td;
+	 wire [31:0]ta, tb, tc, td;
 
     and(ta[0], A[0], ~ctrl[0], ~ctrl[1]);
     and(ta[1], A[1], ~ctrl[0], ~ctrl[1]);
