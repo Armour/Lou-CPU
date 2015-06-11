@@ -19,15 +19,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module regFile(
-        input clk,
+        input btn,
         input Rst,
         input [4:0]regA,
         input [4:0]regB,
+        input [4:0]regC,
         input [4:0]regW,
         input [31:0]Wdat,
         input RegWrite,
         output [31:0]Adat,
-        output [31:0]Bdat
+        output [31:0]Bdat,
+        output [31:0]Cdat
     );
 
     reg [31:0]iRegf[31:0];
@@ -35,6 +37,7 @@ module regFile(
 
     assign Adat = oRegf[regA];
     assign Bdat = oRegf[regB];
+    assign Cdat = oRegf[regC];
 
     always @(Wdat) begin
         if (RegWrite) begin
@@ -43,7 +46,7 @@ module regFile(
     end
 
     integer i;
-    always @(posedge clk) begin
+    always @(posedge btn) begin
         if (Rst) begin
             for (i=0; i<32; i=i+1) begin
                 oRegf[i] <= i;
@@ -52,9 +55,9 @@ module regFile(
         end
         else begin
             oRegf[regA] <= iRegf[regA];
-            oREgf[regB] <= iRegf[regB];
+            oRegf[regB] <= iRegf[regB];
+            oRegf[regC] <= iRegf[regC];
         end
     end
-
 
 endmodule
