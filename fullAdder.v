@@ -19,16 +19,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module fullAdder(
-		input a,b,c,mode,
-		output s, cf
+        input a,b,c,mode,
+        output s, cf
     );
 
-	wire xb, t1, t2, t3;
-	xor(xb, b, mode);
-	xor(s, a, xb, c);
-	and(t1, a, xb),
-		(t2, xb, c),
-		(t3, a, c);
-	or (cf, t1, t2, t3);
+    wire xb, t1, t2, t3;
+    xor(xb, b, mode);
+    xor(s, a, xb, c);
+    and(t1, a, xb),
+        (t2, xb, c),
+        (t3, a, c);
+    or (cf, t1, t2, t3);
 
 endmodule

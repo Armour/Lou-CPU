@@ -19,10 +19,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module shift(
-		input	[31:0]in,
-		output [31:0]out
+        input  [31:0]in,
+        output [31:0]out
     );
 
-	assign out = {in[29:0], 2b'0};
+    assign out = {in[29:0], 2b'0};
 
 endmodule

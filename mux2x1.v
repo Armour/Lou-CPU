@@ -19,15 +19,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module mux2x1(
-		input A,
-		input B,
-		input ctrl,
-		output S
+        input A,
+        input B,
+        input ctrl,
+        output S
     );
 
-	wire ta, tb;
-	and(ta, A, ~ctrl);
-	and(ta, B, ctrl);
-	or(S, ta, tb);
+    wire ta, tb;
+    and(ta, A, ~ctrl);
+    and(ta, B, ctrl);
+    or(S, ta, tb);
 
 endmodule
