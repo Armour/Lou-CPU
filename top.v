@@ -32,7 +32,7 @@ module top (
 
     //PC register
     wire [1:0] btn_out;
-    wire [31:0] inst;
+    wire [31:0] inst_one;
     wire [31:0] pc_0, pc_4, pc_new;
 
     //CPU controller
@@ -79,29 +79,29 @@ module top (
 
     pc p(btn_out[0], rst, pc_new[10:2], pc_0[10:2]);
     pc4 p4(pc_0[10:2], pc_4[10:2]);
-    inst in(pc_0[10:2], inst);
+    inst in(pc_0[10:2], inst_one);
 
-    adder32 add(pc_4, {out_ext32[29:0], 2'b00}, pc_4_j);
+    adder32 add(pc_4, {out_ext32[29:0], 2'b00}, 1'b0, 1'b0, pc_4_j, carray_out_flag_j, overflow_flag_j);
 
-    control sc(inst[31:26], ALUop, RegDst, RegWrite, Branch, Jump, MemtoReg, MemRead, MemWrite, ALUsrc, rst);
+    control sc(inst_one[31:26], ALUop, RegDst, RegWrite, Branch, Jump, MemtoReg, MemRead, MemWrite, ALUsrc, rst);
 
-    regFile sg(btn_out[0], rst, inst[25:21], inst[20:16], switch[4:0], i_wreg, i_wdata, RegWrite, o_rdata1, o_rdata2, reg_display);
+    regFile sg(btn_out[0], rst, inst_one[25:21], inst_one[20:16], switch[4:0], i_wreg, i_wdata, RegWrite, o_rdata1, o_rdata2, reg_display);
 
     ALUnit sa(o_rdata1, alu_op2, alu_ctrl, alu_result, zero_flag, carryout_flag, overflow_flag);
 
-    ALUctr sac(ALUop, inst[5:0], alu_ctrl);
+    ALUctr sac(ALUop, inst_one[5:0], alu_ctrl);
 
     pbdebounce pb(clk, btn, btn_out);
 
-    mux2x1 #(5) sm0(inst[20:16], inst[15:11], RegDst, i_wreg); //W1
+    mux2x1 #(5) sm0(inst_one[20:16], inst_one[15:11], RegDst, i_wreg); //W1
     mux2x1 sm1(o_rdata2, out_ext32, ALUsrc, alu_op2); //ALU operand2
     mux2x1 sm2(alu_result, Dmdata, MemtoReg, i_wdata); //Wdata
     mux2x1 sm3(pc_4, pc_4_j, brh_ctr, j_brh_0); //jump 0
-    mux2x1 sm4(j_brh_0, {pc_4[31:28], inst[25:0], 2'b00}, Jump, pc_new); //back to pc
+    mux2x1 sm4(j_brh_0, {pc_4[31:28], inst_one[25:0], 2'b00}, Jump, pc_new); //back to pc
 
-    extend ext(inst[15:0], out_ext32); //sign extended
+    extend ext(inst_one[15:0], out_ext32); //sign extended
 
-    DataMem dm(alu_result[10:2], clk, o_rdata2[31:0], Dmdata[31:0], MemWrite);
+    DataMem dm(clk, o_rdata2[31:0], alu_result[10:2], MemWrite, Dmdata[31:0]);
 
     and (brh_ctr, Branch, zero_flag); //control the branch
 
@@ -120,7 +120,7 @@ module top (
         if(switch[6:5]==2'b00)
             display32num = reg_display;
         else if(switch[6:5]==2'b01)
-            display32num = inst;
+            display32num = inst_one;
         else if(switch[6:5]==2'b11)
             display32num = Dmdata;
     end
