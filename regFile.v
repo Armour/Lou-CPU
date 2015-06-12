@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 module regFile(
         input btn,
-        input Rst,
+        input rst,
         input [4:0]regA,
         input [4:0]regB,
         input [4:0]regC,
@@ -32,32 +32,49 @@ module regFile(
         output [31:0]Cdat
     );
 
-    reg [31:0]iRegf[31:0];
-    reg [31:0]oRegf[31:0];
+    reg [31:0]RegMem[31:0];
 
-    assign Adat = oRegf[regA];
-    assign Bdat = oRegf[regB];
-    assign Cdat = oRegf[regC];
+    assign Adat = RegMem[regA];
+    assign Bdat = RegMem[regB];
+    assign Cdat = RegMem[regC];
 
-    always @(Wdat) begin
-        if (RegWrite) begin
-            iRegf[regW] <= (regW == 5'b00000) ? 32'b0 : Wdat;
-        end
-    end
-
-    integer i;
-    always @(posedge btn) begin
-        if (Rst) begin
-            for (i=0; i<32; i=i+1) begin
-                oRegf[i] <= i;
-                iRegf[i] <= i;
-            end
-        end
-        else begin
-            oRegf[regA] <= iRegf[regA];
-            oRegf[regB] <= iRegf[regB];
-            oRegf[regC] <= iRegf[regC];
-        end
+    always @(negedge btn or posedge rst) begin
+		if (rst == 1'b1) begin
+			RegMem[0] = {32{1'b0}};
+			RegMem[1] = {32{1'b0}};
+			RegMem[2] = {32{1'b0}};
+			RegMem[3] = {32{1'b0}};
+			RegMem[4] = {32{1'b0}};
+			RegMem[5] = {32{1'b0}};
+			RegMem[6] = {32{1'b0}};
+			RegMem[7] = {32{1'b0}};
+			RegMem[8] = {32{1'b0}};
+			RegMem[9] = {32{1'b0}};
+			RegMem[10] = {32{1'b0}};
+			RegMem[11] = {32{1'b0}};
+			RegMem[12] = {32{1'b0}};
+			RegMem[13] = {32{1'b0}};
+			RegMem[14] = {32{1'b0}};
+			RegMem[15] = {32{1'b0}};
+			RegMem[16] = {32{1'b0}};
+			RegMem[17] = {32{1'b0}};
+			RegMem[18] = {32{1'b0}};
+			RegMem[19] = {32{1'b0}};
+			RegMem[20] = {32{1'b0}};
+			RegMem[21] = {32{1'b0}};
+			RegMem[22] = {32{1'b0}};
+			RegMem[23] = {32{1'b0}};
+			RegMem[24] = {32{1'b0}};
+			RegMem[25] = {32{1'b0}};
+			RegMem[26] = {32{1'b0}};
+			RegMem[27] = {32{1'b0}};
+			RegMem[28] = {32{1'b0}};
+			RegMem[29] = {32{1'b0}};
+			RegMem[30] = {32{1'b0}};
+			RegMem[31] = {32{1'b0}};
+		end
+		else if (RegWrite) 
+			RegMem[regW]= (regW == {5{1'b0}})? {32{1'b0}}: Wdat;
     end
 
 endmodule
