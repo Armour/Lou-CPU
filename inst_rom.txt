@@ -1,0 +1,45 @@
+﻿#baseAddr 0000
+#含注释
+start:	lw $r1, 8($r0) 			#r1 = f0000000
+	slt $r2, $r1, $r0			#r2 = 1
+	lw $r3, 24($r9)				#r3 = 1
+	beq $r2, $r3, branch		#r2 = 1	
+	add $r2, $r2, $r2			# if there is a error, $r2 may be 2
+branch:	lw $r4, 52($r0)			#r4 = 33333333
+	lw $r5, 80($r0)				#r5 = aaaaaaaa
+	and $r6, $r4, $r5			#r6 = 22222222
+	or $r7, $r4,$r5				#r7 = bbbbbbbb
+	lw $r8, 4($r0)				#r8 = 00000068
+	add $r9, $r9, $r8			#r9 = r9 + 00000068
+	sw $r2, 24($r9)				#mem[r9 + 24] = 00000001
+	j start						#return start
+
+#不含注释
+start:	lw $r1, 8($r0) 			
+	slt $r2, $r1, $r0			
+	lw $r3, 24($r9)				
+	beq $r2, $r3, branch		
+	add $r2, $r2, $r2			
+branch:	lw $r4, 52($r0)			
+	lw $r5, 80($r0)				
+	and $r6, $r4, $r5			
+	or $r7, $r4,$r5				
+	lw $r8, 4($r0)
+	add $r9, $r9, $r8			
+	sw $r2, 24($r9)
+	j start
+
+#反汇编
+0:	lw $r1, 8($r0)
+4:	slt $r2, $r1, $r0
+8:	lw $r3, 24($r9)
+c:	beq $r2, $r3, 1
+10:	add $r2, $r2, $r2
+14:	lw $r4, 52($r0)
+18:	lw $r5, 80($r0)
+1c:	and $r6, $r4, $r5
+20:	or $r7, $r4, $r5
+24:	lw $r8, 4($r0)
+28:	add $r9, $r9, $r8
+2c:	sw $r2, 24($r9)
+30:	j 0
