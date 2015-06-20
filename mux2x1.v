@@ -19,10 +19,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module mux2x1(A, B, Ctrl, S);
-	parameter N=32;
-	input wire [N-1:0] A, B;
-	input wire Ctrl;
-	output wire [N-1:0] S;
-	assign S = Ctrl? B : A;
+    parameter N=32;
+    input wire [N-1:0] A, B;
+    input wire Ctrl;
+    output wire [N-1:0] S;
+
+    assign S = Ctrl? B : A;
 
 endmodule

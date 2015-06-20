@@ -18,8 +18,6 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-`timescale 1ns / 1ps
-
 module display16bits(
     input wire        clk,
     input wire [15:0] digit,

@@ -18,7 +18,6 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-
 module ALUnit(Adat, Bdat, ALUoper, Result, zero, carryout, overflow);
     input [31:0] Adat;
     input [31:0] Bdat;

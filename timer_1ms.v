@@ -18,9 +18,10 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-
-module timer_1ms(input wire clk, output reg clk_1ms);
-
+module timer_1ms(
+        input wire clk,
+        output reg clk_1ms
+    );
     reg [15:0] cnt;
 
     initial begin

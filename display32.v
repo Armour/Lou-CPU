@@ -18,7 +18,6 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-
 module display32bits(clk,disp_num,digit_anode,segment);
     input          clk;
     input  [31:0]  disp_num;

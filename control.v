@@ -18,7 +18,6 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-
 module control(OP, ALUop, RegDst, RegWrite, Branch, Jump, MemtoReg, MemRead, MemWrite, ALUsrc, rst);
     input  wire      rst;
     input  wire[5:0] OP;
