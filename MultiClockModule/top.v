@@ -3,24 +3,22 @@ module top (
         input wire clk, rst,
         input wire [6:0] switch,
         input wire btn,
-        output reg[15:0] segment,
-        output reg[11:0] anode
+        output [15:0] segment,
+        output [11:0] anode
     );
     
     //debounce module of btns
 	wire btn_out;
 	pbdebounce pb0(clk,btn,btn_out);
-
+	wire [3:0]state;
 	//Signals about the controller
-	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCwrite, PCWriteCond;
+	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCWriteCond;
 	wire [1:0] PCsrc,ALUop, ALUsrcB;
-    and(PCwrite0,PCWriteCond,ALUzero);
-    and(PCsignal,PCwrite0,PCwrite);
-	
 	//PC module
 	wire PCwrite0;
 	wire [31:0] PC, PCin;
 	wire PCsignal;   //PC write enable
+	
 	
 	//Memory Module
 	wire [31:0] MemAddr;
@@ -32,7 +30,7 @@ module top (
 	
 	//ALU module
 	wire [2:0] ALUsignal; //control signal of ALU
-	wire[31:0][1:0] ALUnum;
+	wire [31:0] ALUnum[1:0];
 	wire [31:0] ALUres,ALUregnum;
 	wire ALUzero, ALUcarryout,ALUoverflow;
 	
@@ -44,6 +42,8 @@ module top (
 	reg[31:0] display32bits;
 	wire [31:0] display32bitswire; 
 	
+    and(PCwrite0,PCWriteCond,ALUzero);
+    and(PCsignal,PCwrite0,PCwrite);
 	
 	//Multiplexers
 	mux2x1 mux0(instruction[20:16],instruction[15:11],RegDst,rf_write_addr);  //select the R2 of RegFile
@@ -52,7 +52,8 @@ module top (
 	mux2x1 mux3(PC,ALUregnum,IorD,MemAddr);  //select the address to the Memory
     mux4x1 mux4(RegBout,32'h4,ext32,ext32sft,ALUsrcB,ALUnum[1]); //select the second operand of ALU
     mux4x1 mux5(ALUres,ALUregnum,{PC[31:28],instruction[25:0],2'b00},1'bx,PCsrc,PCin); //select address of the next instruction
-
+	//controller
+	ctrl c0(clk,rst,instruction[31:26],RegDst,RegWrite,ALUSrcA,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,ALUop,ALUSrcB,PCsrc,state);
 	/*This part should be replaced by the memory part, which has the read enable and write enable*/
 	//DataMem dm(clk, o_rdata2[31:0], alu_result[10:2], MemWrite, Dmdata[31:0]);
 	//Mem m0();   //the shared memory between instruction and data
@@ -74,9 +75,8 @@ module top (
     ALUctr ALucontrol(ALUop,instruction[5:0],ALUsignal);
     ALUnit ALU(ALUnum[0],ALUnum[1],ALUsignal,ALUres,ALUzero,ALUcarryout,ALUoverflow);
 
-	display16bits disp0();
-	display32bits disp1();
-	
+	display16bits disp0(clk,PC[15:0],anode[3:0],segment[7:0]);
+	display32bits disp1(clk,display32bits,anode[11:4],segment[15:8]);
 	always @(switch) begin
         if(switch[6:5]==2'b00)
             display32bits = RegFileOut3;

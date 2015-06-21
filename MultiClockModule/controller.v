@@ -1,5 +1,4 @@
 `timescale 1ns / 1ps
-
 module ctrl(
         input clk,
         input rst,
