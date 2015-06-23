@@ -48,7 +48,7 @@ module regFile(
 			RegMem[5] = {32{1'b0}};
 			RegMem[6] = {32{1'b0}};
 			RegMem[7] = {32{1'b0}};
-			RegMem[8] = {32{1'b0}};
+			RegMem[8] = {32{1'b1}};
 			RegMem[9] = {32{1'b0}};
 			RegMem[10] = {32{1'b0}};
 			RegMem[11] = {32{1'b0}};

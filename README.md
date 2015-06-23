@@ -1,8 +1,6 @@
 # Multi-Clock CPU
 #### Collaborators: Bernard, Armour (Name in Descending Order)
 
-## ToDo:
-* The Control Unit of CPU, that is, managing the control signal of different operations and transferring from different operations.
-* Migrate the modules in Single Clock CPU to Multi-Clock CPU.
-* The timing requires adjusting.
-* The register file between different main modules.
+## Debug
+1. It seems that some thing is wrong with the control part. All the signal appears to be 0's.
+2. And the ALUres is the code of instruction, which cannot be tolerated.
