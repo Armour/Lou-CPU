@@ -40,6 +40,7 @@ module regFile(
 
     always @(negedge btn or posedge rst) begin
 		if (rst == 1'b1) begin
+
 			RegMem[0] = {32{1'b0}};
 			RegMem[1] = {32{1'b0}};
 			RegMem[2] = {32{1'b0}};
@@ -48,7 +49,7 @@ module regFile(
 			RegMem[5] = {32{1'b0}};
 			RegMem[6] = {32{1'b0}};
 			RegMem[7] = {32{1'b0}};
-			RegMem[8] = {32{1'b1}};
+			RegMem[8] = {32{1'b0}};
 			RegMem[9] = {32{1'b0}};
 			RegMem[10] = {32{1'b0}};
 			RegMem[11] = {32{1'b0}};
@@ -72,6 +73,7 @@ module regFile(
 			RegMem[29] = {32{1'b0}};
 			RegMem[30] = {32{1'b0}};
 			RegMem[31] = {32{1'b0}};
+
 		end
 		else if (RegWrite) 
 			RegMem[regW]= (regW == {5{1'b0}})? {32{1'b0}}: Wdat;
