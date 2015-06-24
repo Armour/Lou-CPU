@@ -38,7 +38,6 @@ module ctrl(
                 begin
                     state <= ID;
                 end
-
                 ID: //state 1
                 begin
                     case (OP[5:0])
@@ -55,7 +54,6 @@ module ctrl(
                             state <= EX_R;
                     endcase
                 end
-
                 EX_LS://state 2
                 begin
                     case (OP[5:0])
@@ -65,7 +63,6 @@ module ctrl(
                             state <= MEM_ST; //SW, goto 5
                     endcase
                 end
-
                 MEM_RD: //state 3
                 begin
                     state <= WB_LS;

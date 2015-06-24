@@ -45,31 +45,31 @@ module top (
 	reg[31:0] display32bits;
 	wire [31:0] display32bitswire; 
 	
-   	and(PCwrite0,PCWriteCond,ALUzero);
-   	or(PCsignal,PCwrite0,PCwrite);
+   and(PCwrite0,PCWriteCond,ALUzero);
+   or(PCsignal,PCwrite0,PCwrite);
 	
 	
 	//Multiplexers
 	mux2x1 #(5) mux0(instruction[20:16],instruction[15:11],RegDst,rf_write_addr);  //select the R2 of RegFile
 	mux2x1 mux1(ALUregnum,data,MemToReg,rf_write_data);   //select the data to  write into the RegFile
-    mux2x1 mux2(PC,RegAOut,ALUsrcA,ALUnum[0]); //select the first operand of ALU
+   mux2x1 mux2(PC,RegAOut,ALUsrcA,ALUnum[0]); //select the first operand of ALU
 	mux2x1 mux3(PC,ALUregnum,IorD,MemAddr);  //select the address to the Memory
-    mux4x1 mux4(RegBOut,32'h4,ext32,ext32sft,ALUsrcB,ALUnum[1]); //select the second operand of ALU
-    mux4x1 mux5(ALUres,ALUregnum,{PC[31:28],instruction[25:0],2'b00},1'bx,PCsrc,PCin); //select address of the next instruction
+   mux4x1 mux4(RegBOut,32'h4,ext32,ext32sft,ALUsrcB,ALUnum[1]); //select the second operand of ALU
+   mux4x1 mux5(ALUres,ALUregnum,{PC[31:28],instruction[25:0],2'b00},1'bx,PCsrc,PCin); //select address of the next instruction
 	
 
 	//controller
 
-	ctrl c0(clk,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,ALUop,ALUsrcB,PCsrc,state);
-	IDmem mem(btn_out,MemRead,MemWrite,MemAddr[10:2],RegBOut,mem_out_data);   //the shared memory between instruction and data
+	ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,ALUop,ALUsrcB,PCsrc,state);
+	IP1004 mem(clk,MemRead,MemWrite,MemAddr[10:2],RegBOut,mem_out_data);   //the shared memory between instruction and data
 	
 	//Registers
-	register PCreg(clk,PCsignal,PCin,PC);	
-	register IR(clk,IRwrite,mem_out_data,instruction);   //instruction register and data register 
-	register DR(clk,1'b1,mem_out_data,data);
-    register rfreg1(clk,1'b1,RegFileOut1,RegAOut);
-    register rfreg2(clk,1'b1,RegFileOut2,RegBOut);
-    register ALUout(clk,1'b1,ALUres,ALUregnum);
+	register PCreg(btn_out,PCsignal,PCin,PC);	
+	register IR(btn_out,IRwrite,mem_out_data,instruction);   //instruction register and data register 
+	register DR(btn_out,1'b1,mem_out_data,data);
+    register rfreg1(btn_out,1'b1,RegFileOut1,RegAOut);
+    register rfreg2(btn_out,1'b1,RegFileOut2,RegBOut);
+    register ALUout(btn_out,1'b1,ALUres,ALUregnum);
 	//RegFile
 	regFile rf(btn_out,rst,instruction[25:21],instruction[20:16],switch[4:0],rf_write_addr,rf_write_data,RegWrite,RegFileOut1,RegFileOut2,RegFileOut3);
 	//address extension
@@ -97,9 +97,10 @@ module top (
 			else if(switch[7:5]==3'b101)				//ALUres
 				display32bits = ALUres;
 			else if(switch[7:5]==3'b110)            //PCin
-				display32bits = PCin;
+				display32bits = rf_write_data;
 			else if(switch[7:5]==3'b111)
-				display32bits = {PCwrite, PCWriteCond,PCsrc, PCsignal,IorD, MemRead, MemWrite, MemToReg, IRwrite,RegWrite,RegDst,ALUop,ALUsrcB,ALUsrcA,ALUzero, ALUcarryout,ALUoverflow};
+				display32bits = mem_out_data;
+								//    1 				1          
     end
 endmodule
 
