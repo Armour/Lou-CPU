@@ -40,7 +40,6 @@ module regFile(
 
     always @(negedge btn or posedge rst) begin
 		if (rst == 1'b1) begin
-
 			RegMem[0] = {32{1'b0}};
 			RegMem[1] = {32{1'b0}};
 			RegMem[2] = {32{1'b0}};

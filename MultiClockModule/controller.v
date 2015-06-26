@@ -120,7 +120,7 @@ module ctrl(
     assign ALUSrcA = status[2] | status[6] | status[8];
     assign IorD = status[3] | status[5];
     assign IRWrite = status[0];
-    assign MemRead = status[0] | status[3];
+    assign MemRead = status[0] | status[3]|status[5];
     assign MemWrite = status[5];
     assign MemtoReg = status[4];
     assign PCWriteCond = status[8];

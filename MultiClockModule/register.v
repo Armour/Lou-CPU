@@ -27,12 +27,12 @@ module register(
 
     reg[31:0] kdat;
 
-    always @(posedge clk) begin
+    always @(idat) begin
         if (RegWrite) kdat <= idat;
     end
 
     always @(posedge clk) begin
-        odat <= kdat;
+		odat = kdat;
     end
 
 endmodule
