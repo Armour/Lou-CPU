@@ -1,5 +1,4 @@
 `timescale 1ns / 1ps
-
 module ctrl(
         input clk,
         input rst,
@@ -39,7 +38,6 @@ module ctrl(
                 begin
                     state <= ID;
                 end
-
                 ID: //state 1
                 begin
                     case (OP[5:0])
@@ -56,7 +54,6 @@ module ctrl(
                             state <= EX_R;
                     endcase
                 end
-
                 EX_LS://state 2
                 begin
                     case (OP[5:0])
@@ -66,7 +63,6 @@ module ctrl(
                             state <= MEM_ST; //SW, goto 5
                     endcase
                 end
-
                 MEM_RD: //state 3
                 begin
                     state <= WB_LS;
@@ -124,7 +120,7 @@ module ctrl(
     assign ALUSrcA = status[2] | status[6] | status[8];
     assign IorD = status[3] | status[5];
     assign IRWrite = status[0];
-    assign MemRead = status[0] | status[3];
+    assign MemRead = status[0] | status[3]|status[5];
     assign MemWrite = status[5];
     assign MemtoReg = status[4];
     assign PCWriteCond = status[8];

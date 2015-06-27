@@ -32,7 +32,7 @@ module register(
     end
 
     always @(posedge clk) begin
-        odat <= kdat;
+		odat = kdat;
     end
 
 endmodule
