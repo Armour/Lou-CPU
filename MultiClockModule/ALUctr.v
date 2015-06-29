@@ -24,10 +24,9 @@ module ALUctr(
         output[2:0] ALUoper
     );
 
-    wire t1, t2;
-    or (t1, Func[0], Func[3]);
-    and (t2, Func[1], ALUop[1]);
-    or (ALUoper[2], t2, ALUop[0]);
+    wire t1;
+    and (t1, Func[1], ALUop[1]);
+    or (ALUoper[2], t1, ALUop[0]);
     or (ALUoper[1], ~Func[2], ~ALUop[1]);
-    and (ALUoper[0], t1, ALUop[1]);
+    and (ALUoper[0], Func[0], ALUop[1]);
 endmodule
