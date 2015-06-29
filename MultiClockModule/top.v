@@ -21,9 +21,12 @@ module top (
 	assign #6 btn_out_6ns=btn_out;
 	assign #8 btn_out_8ns=btn_out;
 	//Signals about the controller
-	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCWriteCond;
+	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCWriteCond, PCCondSrc;
 	wire [1:0] PCsrc,ALUop, ALUsrcB;
 	wire [3:0]state;
+
+    //PC Bne/Beq AND gate
+    wire Bneq;  //beq or bne?
 
 	//PC module
 	wire PCwrite0;
@@ -62,7 +65,7 @@ module top (
 	register rfreg2(btn_out,1'b1,RegFileOut2,RegBOut);
 	register ALUout(btn_out,1'b1,ALUres,ALUregnum);
 	
-   and(PCwrite0,PCWriteCond,ALUzero);
+   and(PCwrite0,PCWriteCond,Bneq);
    or(PCsignal,PCwrite0,PCwrite);
 	
 	//Multiplexers
@@ -72,9 +75,10 @@ module top (
 	mux2x1 mux3(PC,ALUregnum,IorD,MemAddr);  //select the address to the Memory
    mux4x1 mux4(RegBOut,32'h4,ext32,ext32sft,ALUsrcB,ALUnum[1]); //select the second operand of ALU
    mux4x1 mux5(ALUres,ALUregnum,{PC[31:28],instruction[25:0],2'b00},1'bx,PCsrc,PCin); //select address of the next instruction
+   mux2x1 #(1) mux6(~ALUzero, ALUzero, PCCondSrc, Bneq);
 	
 	//controller
-	ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,ALUop,ALUsrcB,PCsrc,state);
+	ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,PCCondSrc,ALUop,ALUsrcB,PCsrc,state);
 	IP6261114 mem(~(btn_out),MemRead,MemWrite,MemAddr[10:2],RegBOut,mem_out_data);   //the shared memory between instruction and data
 	
 	//RegFil

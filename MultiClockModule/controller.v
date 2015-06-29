@@ -13,17 +13,19 @@ module ctrl(
         output MemtoReg,
         output PCWriteCond,
         output PCWrite,
+        output PCCondSrc,   // choose beq/bne
         output wire [1:0] ALUOp,
         output wire [1:0] ALUSrcB,
         output wire [1:0] PCSource,
         output reg [3:0] state
     );
 
-    wire [9:0] status;
+    wire [11:0] status;
 
     parameter IF     = 4'b0000, ID    = 4'b0001, EX_LS  = 4'b0010,
               MEM_RD = 4'b0011, WB_LS = 4'b0100, MEM_ST = 4'b0101,
-              EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000, J_CPN = 4'b1001;
+              EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000, 
+              J_CPN = 4'b1001,  BN_CPN= 4'b1010, ADDI_2 = 4'b1011;
 
     initial begin
         state <= 4'b1111;
@@ -45,11 +47,15 @@ module ctrl(
                             state <= EX_R;
                         6'b000010: //Jump
                             state <= J_CPN;
+                        6'b001000:
+                            state <= ADDI_2;
                         6'b100011,
                         6'b101011: //Load or Store
                             state <= EX_LS;
                         6'b000100: //BEQ
                             state <= BR_CPN;
+                        6'b000101: //BNE
+                            state <= BN_CPN;
                         default:
                             state <= EX_R;
                     endcase
@@ -83,6 +89,11 @@ module ctrl(
                     state <= WB_R;
                 end
 
+                ADDI_2:
+                begin
+                    state <= WB_R;
+                end
+
                 WB_R: //state 7, write back register
                 begin
                     state <= IF;
@@ -94,6 +105,11 @@ module ctrl(
                 end
 
                 J_CPN: //state 9
+                begin
+                    state <= IF;
+                end
+
+                BN_CPN:
                 begin
                     state <= IF;
                 end
@@ -114,19 +130,22 @@ module ctrl(
     assign status[7] = (state==4'b0111);
     assign status[8] = (state==4'b1000);
     assign status[9] = (state==4'b1001);
+    assign status[10]= (state==4'b1010);
+    assign status[11]= (state==4'b1011);
 
     assign RegDst = status[7];
     assign RegWrite = status[4] | status[7];
-    assign ALUSrcA = status[2] | status[6] | status[8];
+    assign ALUSrcA = status[2] | status[6] | status[8] | status[11];
     assign IorD = status[3] | status[5];
     assign IRWrite = status[0];
     assign MemRead = status[0] | status[3]|status[5];
     assign MemWrite = status[5];
     assign MemtoReg = status[4];
-    assign PCWriteCond = status[8];
+    assign PCWriteCond = status[8] | status[10];
     assign PCWrite = status[0] | status[9];
+    assign PCCondSrc = status[8];
     assign ALUOp = {status[6], status[8]};
-    assign ALUSrcB = {status[1] | status[2], status[0] | status[1]};
+    assign ALUSrcB = {status[1] | status[2] | status[11], status[0] | status[1]};
     assign PCSource = {status[9], status[8]};
 
 endmodule
