@@ -20,12 +20,13 @@ module ctrl(
         output reg [3:0] state
     );
 
-    wire [11:0] status;
+    wire [12:0] status;
 
     parameter IF     = 4'b0000, ID    = 4'b0001, EX_LS  = 4'b0010,
               MEM_RD = 4'b0011, WB_LS = 4'b0100, MEM_ST = 4'b0101,
               EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000, 
-              J_CPN = 4'b1001,  BN_CPN= 4'b1010, ADDI_2 = 4'b1011;
+              J_CPN = 4'b1001,  BN_CPN= 4'b1010, ADDI_2 = 4'b1011,
+              ADDI_W = 4'b1100;
 
     initial begin
         state <= 4'b1111;
@@ -91,7 +92,7 @@ module ctrl(
 
                 ADDI_2:
                 begin
-                    state <= WB_R;
+                    state <= ADDI_W;
                 end
 
                 WB_R: //state 7, write back register
@@ -132,10 +133,12 @@ module ctrl(
     assign status[9] = (state==4'b1001);
     assign status[10]= (state==4'b1010);
     assign status[11]= (state==4'b1011);
+    assign status[12]= (state==4'b1100);
+    
 
     assign RegDst = status[7];
-    assign RegWrite = status[4] | status[7];
-    assign ALUSrcA = status[2] | status[6] | status[8] | status[11];
+    assign RegWrite = status[4] | status[7] | status[12];
+    assign ALUSrcA = status[2] | status[6] | status[8] | status[10] | status[11];
     assign IorD = status[3] | status[5];
     assign IRWrite = status[0];
     assign MemRead = status[0] | status[3]|status[5];
@@ -146,6 +149,6 @@ module ctrl(
     assign PCCondSrc = status[8];
     assign ALUOp = {status[6], status[8]};
     assign ALUSrcB = {status[1] | status[2] | status[11], status[0] | status[1]};
-    assign PCSource = {status[9], status[8]};
+    assign PCSource = {status[9], status[8] | status[10]};
 
 endmodule
