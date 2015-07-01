@@ -27,7 +27,7 @@ module ctrl(
               MEM_RD = 4'b0011, WB_LS = 4'b0100, MEM_ST = 4'b0101,
               EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000,
               J_CPN = 4'b1001,  BN_CPN= 4'b1010, ADDI_2 = 4'b1011,
-              ADDI_W = 4'b1100, JAL   = 4'b1101, AO_I  = 4'b1110;
+              ADDI_W = 4'b1100, JAL   = 4'b1101, XAO_I  = 4'b1110;
 
     initial begin
         state <= 4'b1111;
@@ -51,8 +51,10 @@ module ctrl(
                             state <= J_CPN;
                         6'b001000:
                             state <= ADDI_2;
-                        6'b001100:
-                            state <= AO_I;
+                        6'b001100,
+                        6'b001101,
+                        6'b001110:
+                            state <= XAO_I;
                         6'b100011,
                         6'b101011: //Load or Store
                             state <= EX_LS;
@@ -60,7 +62,7 @@ module ctrl(
                             state <= BR_CPN;
                         6'b000101: //BNE
                             state <= BN_CPN;
-   						6'b000011: //Jal
+                           6'b000011: //Jal
                             state <= JAL;
                         default:
                             state <= EX_R;
@@ -100,7 +102,7 @@ module ctrl(
                     state <= ADDI_W;
                 end
 
-                AO_I:
+                XAO_I:
                 begin
                     state <= ADDI_W;
                 end
@@ -149,7 +151,7 @@ module ctrl(
     assign status[10]= (state==4'b1010);
     assign status[11]= (state==4'b1011);
     assign status[12]= (state==4'b1100);
-	assign status[13]= (state==4'b1101);
+    assign status[13]= (state==4'b1101);
     assign status[14]= (state==4'b1110);
 
 
@@ -165,7 +167,7 @@ module ctrl(
     assign PCWriteCond = status[8] | status[10];
     assign PCWrite = status[0] | status[9];
     assign PCCondSrc = status[8];
-    assign ALUOp = {status[6], status[8]};
+    assign ALUOp = {status[6] | status[14], status[8] | status[14]};
     assign ALUSrcB = {status[1] | status[2] | status[11], status[0] | status[1]};
     assign PCSource = {status[9], status[8] | status[10]};
 
