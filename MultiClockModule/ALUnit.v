@@ -36,7 +36,7 @@ module ALUnit(Adat, Bdat, ALUoper, Result, zero, carryout, overflow);
     xor(cyt, caryt, ALUoper[2]); //SUB
     xor(slt, overf, addsub[31]); //SLT
 
-    mux8x1 mx8(andt, orxt, addsub, {31'h0,slt}, {ALUoper[3],ALUoper[1],ALUoper[0]},xort,32'h0,32'h0,32'h0, Result);
+    mux8x1 mx8(andt, orxt, addsub, {31'h0,slt}, {ALUoper[3],ALUoper[1],ALUoper[0]}, xort, 32'h0, 32'h0, 32'h0, Result);
 
     and(carryout, ALUoper[1], ~ALUoper[0], cyt); //carryout
     and(overflow, ALUoper[1], ~ALUoper[0], overf); //overflow
