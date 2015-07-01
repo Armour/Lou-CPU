@@ -6,7 +6,7 @@ module top (
         output [15:0] segment,
         output [11:0] anode
     );
-    
+
     //debounce module of btns
 	wire btn_out;
 	wire btn_out_1ns;
@@ -20,8 +20,9 @@ module top (
 	assign #4 btn_out_4ns=btn_out;
 	assign #6 btn_out_6ns=btn_out;
 	assign #8 btn_out_8ns=btn_out;
+
 	//Signals about the controller
-	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCWriteCond, PCCondSrc;
+	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCWriteCond, PCCondSrc, ALUctrInst;
 	wire [1:0] PCsrc,ALUop, ALUsrcB;
 	wire [3:0]state;
 
@@ -32,31 +33,32 @@ module top (
 	wire PCwrite0;
 	wire [31:0] PC, PCin;
 	wire PCsignal;   //PC write enable
-	
+
 	//Memory Module
 	wire [31:0] MemAddr;
 	wire [31:0] mem_out_data;
-	
+
 	//RegFile Module
 	wire [4:0] rf_write_addr;   //the write address of memory
 	wire [31:0] rf_write_data;  //the write data of memory
 	wire[31:0] RegFileOut1, RegFileOut2, RegFileOut3;
-	
+
 	//ALU module
 	wire [2:0] ALUsignal; //control signal of ALU
 	wire [31:0] ALUnum[1:0];
 	wire [31:0] ALUres,ALUregnum;
+    wire [5:0] ALUinst;
 	wire ALUzero, ALUcarryout,ALUoverflow;
-	
+
 	//register module
-	wire[31:0] RegAOut, RegBOut;	
-	wire [31:0] instruction, data;  //the instructions and data read from the memory  
+	wire[31:0] RegAOut, RegBOut;
+	wire [31:0] instruction, data;  //the instructions and data read from the memory
 	//extension module
 	wire [31:0]  ext32,ext32sft;
 	//display numbers
 	reg[31:0] display32bits;
-	wire [31:0] display32bitswire; 
-	
+	wire [31:0] display32bitswire;
+
 	//registers
 	PCregister PCreg(btn_out,PCsignal,PCin,PC);
 	register IR(btn_out_4ns,IRwrite,mem_out_data,instruction);   //instruction register and data register
@@ -64,10 +66,10 @@ module top (
 	register rfreg1(btn_out,1'b1,RegFileOut1,RegAOut);
 	register rfreg2(btn_out,1'b1,RegFileOut2,RegBOut);
 	register ALUout(btn_out,1'b1,ALUres,ALUregnum);
-	
+
    and(PCwrite0,PCWriteCond,Bneq);
    or(PCsignal,PCwrite0,PCwrite);
-	
+
 	//Multiplexers
 	mux2x1 #(5) mux0(instruction[20:16],instruction[15:11],RegDst,rf_write_addr);  //select the R2 of RegFile
 	mux2x1 mux1(ALUregnum,data,MemToReg,rf_write_data);   //select the data to  write into the RegFile
@@ -76,21 +78,22 @@ module top (
    mux4x1 mux4(RegBOut,32'h4,ext32,ext32sft,ALUsrcB,ALUnum[1]); //select the second operand of ALU
    mux4x1 mux5(ALUres,ALUregnum,{PC[31:28],instruction[25:0],2'b00},1'bx,PCsrc,PCin); //select address of the next instruction
    mux2x1 #(1) mux6(~ALUzero, ALUzero, PCCondSrc, Bneq);
-	
+   mux2x1 #(6) mux7(instruction[5:0], instruction[31:26], ALUctrInst, ALUinst[5:0]);
+
 	//controller
-	ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,PCCondSrc,ALUop,ALUsrcB,PCsrc,state);
+	ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,ALUctrInst,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,PCCondSrc,ALUop,ALUsrcB,PCsrc,state);
 	IP6261114 mem(~(btn_out),MemRead,MemWrite,MemAddr[10:2],RegBOut,mem_out_data);   //the shared memory between instruction and data
-	
+
 	//RegFil
 	regFile rf(btn_out,rst,instruction[25:21],instruction[20:16],switch[4:0],rf_write_addr,rf_write_data,RegWrite,RegFileOut1,RegFileOut2,RegFileOut3);
 	//address extension
    extend ext(instruction[15:0],ext32);
    shift sft(ext32,ext32sft);
-    
+
     //ALU modules
-   ALUctr ALucontrol(ALUop,instruction[5:0],ALUsignal);
+   ALUctr ALucontrol(ALUop,ALUinst[5:0],ALUsignal);
    ALUnit ALU(ALUnum[0],ALUnum[1],ALUsignal,ALUres,ALUzero,ALUcarryout,ALUoverflow);
-	
+
 	//display module
 	display16bits disp0(clk,PC[15:0],anode[3:0],segment[7:0]);
 	display32bits disp1(clk,display32bits,anode[11:4],segment[15:8]);
@@ -99,7 +102,7 @@ module top (
             display32bits = RegFileOut3;
         else if(switch[9:5]==5'b00001)				//instruction
 				display32bits = instruction;
-        else if(switch[9:5]==5'b00010)				//data		
+        else if(switch[9:5]==5'b00010)				//data
             display32bits = data;
 		   else if(switch[9:5]==5'b00011)          //ALU operands
 				display32bits = ALUnum[0];
@@ -121,6 +124,5 @@ module top (
 				display32bits = MemAddr[10:2];
 			else if(switch[9:5]==5'b01100)
 				display32bits=ALUregnum;
-   end
+    end
 endmodule
-

@@ -6,6 +6,7 @@ module ctrl(
         output RegDst,
         output RegWrite,
         output ALUSrcA,
+        output ALUctrInst,
         output IorD,
         output IRWrite,
         output MemRead,
@@ -24,9 +25,9 @@ module ctrl(
 
     parameter IF     = 4'b0000, ID    = 4'b0001, EX_LS  = 4'b0010,
               MEM_RD = 4'b0011, WB_LS = 4'b0100, MEM_ST = 4'b0101,
-              EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000, 
+              EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000,
               J_CPN = 4'b1001,  BN_CPN= 4'b1010, ADDI_2 = 4'b1011,
-              ADDI_W = 4'b1100;
+              ADDI_W = 4'b1100, AO_I  = 4'b1110;
 
     initial begin
         state <= 4'b1111;
@@ -50,6 +51,8 @@ module ctrl(
                             state <= J_CPN;
                         6'b001000:
                             state <= ADDI_2;
+                        6'b001100:
+                            state <= AO_I;
                         6'b100011,
                         6'b101011: //Load or Store
                             state <= EX_LS;
@@ -95,6 +98,11 @@ module ctrl(
                     state <= ADDI_W;
                 end
 
+                AO_I:
+                begin
+                    state <= ADDI_W;
+                end
+
                 WB_R: //state 7, write back register
                 begin
                     state <= IF;
@@ -134,11 +142,13 @@ module ctrl(
     assign status[10]= (state==4'b1010);
     assign status[11]= (state==4'b1011);
     assign status[12]= (state==4'b1100);
-    
+    assign status[14]= (state==4'b1110);
+
 
     assign RegDst = status[7];
     assign RegWrite = status[4] | status[7] | status[12];
     assign ALUSrcA = status[2] | status[6] | status[8] | status[10] | status[11];
+    assign ALUctrInst = status[14];
     assign IorD = status[3] | status[5];
     assign IRWrite = status[0];
     assign MemRead = status[0] | status[3]|status[5];
