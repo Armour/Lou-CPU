@@ -31,10 +31,10 @@ module ALUctr(
     wire oper2_1, oper2_2, oper2_3;
     wire oper3_1, oper3_2;
 
-    and (Op_00, ALUop[0], ALUop[1]);
-    and (Op_01, ~ALUop[0], ALUop[1]);
-    and (R_type, ALUop[0], ~ALUop[1]);
-    and (I_type, ~ALUop[0], ~ALUop[1]);
+    and (Op_00, ~ALUop[0], ~ALUop[1]);
+    and (Op_01, ALUop[0], ~ALUop[1]);
+    and (R_type, ~ALUop[0], ALUop[1]);
+    and (I_type, ALUop[0], ALUop[1]);
 
     and (Add_func, ~Func[2], ~Func[1], ~Func[0]); //x000
     and (Sub_func, ~Func[3], ~Func[2], Func[1], ~Func[0]); //0010

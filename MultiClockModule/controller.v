@@ -22,7 +22,7 @@ module ctrl(
         output wire RaWrite
     );
 
-    wire [12:0] status;
+    wire [14:0] status;
 
     parameter IF     = 4'b0000, ID    = 4'b0001, EX_LS  = 4'b0010,
               MEM_RD = 4'b0011, WB_LS = 4'b0100, MEM_ST = 4'b0101,
