@@ -74,7 +74,7 @@ module regFile(
 			RegMem[31] = {32{1'b0}};
 
 		end
-		else if (RegWrite) 
+		else if (RegWrite)
 			RegMem[regW]= (regW == {5{1'b0}})? {32{1'b0}}: Wdat;
     end
 
