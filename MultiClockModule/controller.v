@@ -23,7 +23,7 @@ module ctrl(
 
     parameter IF     = 4'b0000, ID    = 4'b0001, EX_LS  = 4'b0010,
               MEM_RD = 4'b0011, WB_LS = 4'b0100, MEM_ST = 4'b0101,
-              EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000, J_CPN = 4'b1001;
+              EX_R   = 4'b0110, WB_R  = 4'b0111, BR_CPN = 4'b1000, J_CPN = 4'b1001,
               JAL    = 4'b1010;
 
     initial begin
@@ -51,7 +51,7 @@ module ctrl(
                             state <= EX_LS;
                         6'b000100: //BEQ
                             state <= BR_CPN;
-                        6'bxxxxxx: //Jal
+                        6'b000011: //Jal
                             state <= JAL;
                         default:
                             state <= EX_R;
@@ -125,7 +125,7 @@ module ctrl(
     assign status[10]= (state==4'b1010);
 
     assign RegDst = status[7];
-    assign RegWrite = status[4] | status[7] | state[10];
+    assign RegWrite = status[4] | status[7] | status[10];
     assign ALUSrcA = status[2] | status[6] | status[8];
     assign IorD = status[3] | status[5];
     assign IRWrite = status[0];
