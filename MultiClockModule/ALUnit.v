@@ -24,18 +24,19 @@ module ALUnit(Adat, Bdat, ALUoper, Result, zero, carryout, overflow);
     input [31:0] Bdat;
     output [31:0] Result;
 
-    input [2:0] ALUoper;
+    input [3:0] ALUoper;
     output zero, carryout, overflow;
 
     wire slt, caryt, overf;
-    wire[31:0] andt, orxt, addsub; //与、或、加减结�
+    wire[31:0] andt, orxt, addsub, xort; //与、或、加减结��
     and32 an1(andt, Adat, Bdat); //AND
     or32 or1(orxt, Adat, Bdat); //OR
+    xor32 xor0(xort,Adat,Bdat);
     adder32 add32(Adat, Bdat, ALUoper[2], ALUoper[2], addsub, caryt, overf); //Add/Sub
     xor(cyt, caryt, ALUoper[2]); //SUB
     xor(slt, overf, addsub[31]); //SLT
 
-    mux4x1 mx4(andt, orxt, addsub, {31'h0,slt}, {ALUoper[1],ALUoper[0]}, Result);
+    mux8x1 mx8(andt, orxt, addsub, {31'h0,slt}, {ALUoper[3],ALUoper[1],ALUoper[0]},xort,32'h0,32'h0,32'h0, Result);
 
     and(carryout, ALUoper[1], ~ALUoper[0], cyt); //carryout
     and(overflow, ALUoper[1], ~ALUoper[0], overf); //overflow
@@ -49,4 +50,3 @@ module ALUnit(Adat, Bdat, ALUoper, Result, zero, carryout, overflow);
               Result[28], Result[29], Result[30], Result[31]);
 
 endmodule
-
