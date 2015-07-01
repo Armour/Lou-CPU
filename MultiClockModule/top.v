@@ -17,7 +17,7 @@ module top (
     pbdebounce pb0(clk, btn, btn_out);
 
     //Signals about the controller
-    wire ALUsrcA, RegWrite, RegDst, IRwrite, MemToReg, MemRead, MemWrite, IorD, PCwrite, PCWriteCond, PCCondSrc, ALUctrInst;
+    wire ALUsrcA, RegWrite, RegDst, IRwrite, MemToReg, MemRead, MemWrite, IorD, PCwrite, PCWriteCond, PCCondSrc, ALUctrInst, RaWrite;
     wire [1:0] PCsrc, ALUop, ALUsrcB;
     wire [3:0]state;
 
@@ -34,8 +34,8 @@ module top (
     wire [31:0] mem_out_data;
 
     //RegFile Module
-    wire [4:0] rf_write_addr;   //the write address of memory
-    wire [31:0] rf_write_data;  //the write data of memory
+    wire [4:0]  rf_write_addr, rf_write_addr_final;   //the write address of memory
+    wire [31:0] rf_write_data, rf_write_data_final;  //the write data of memory
     wire[31:0] RegFileOut1, RegFileOut2, RegFileOut3;
 
     //ALU module
@@ -74,13 +74,15 @@ module top (
     mux4x1 mux5(ALUres,ALUregnum,{PC[31:28],instruction[25:0],2'b00},1'bx,PCsrc,PCin); //select address of the next instruction
     mux2x1 #(1) mux6(~ALUzero, ALUzero, PCCondSrc, Bneq);
     mux2x1 #(6) mux7(instruction[5:0], instruction[31:26], ALUctrInst, ALUinst[5:0]);
+    mux2x1 mux8(rf_write_data,PCin, RaWrite, rf_write_data_final);
+    mux2x1 #(5) mux9(rf_write_addr, 5'b1111, RaWrite, rf_write_addr_final);
 
     //controller
-    ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,ALUctrInst,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,PCCondSrc,ALUop,ALUsrcB,PCsrc,state);
+    ctrl c0(btn_out,rst,instruction[31:26],RegDst,RegWrite,ALUsrcA,ALUctrInst,IorD,IRwrite,MemRead,MemWrite,MemToReg,PCWriteCond,PCwrite,PCCondSrc,ALUop,ALUsrcB,PCsrc,state,RaWrite);
     IP6261114 mem(~(btn_out),MemRead,MemWrite,MemAddr[10:2],RegBOut,mem_out_data);   //the shared memory between instruction and data
 
     //RegFil
-    regFile rf(btn_out,rst,instruction[25:21],instruction[20:16],switch[4:0],rf_write_addr,rf_write_data,RegWrite,RegFileOut1,RegFileOut2,RegFileOut3);
+    regFile rf(btn_out,rst,instruction[25:21],instruction[20:16],switch[4:0],rf_write_addr_final,rf_write_data_final,RegWrite,RegFileOut1,RegFileOut2,RegFileOut3);
     //address extension
     extend ext(instruction[15:0],ext32);
     shift sft(ext32,ext32sft);
@@ -106,7 +108,7 @@ module top (
             else if(switch[9:5]==5'b00101)                //ALUres
                 display32bits = ALUres;
             else if(switch[9:5]==5'b00110)            //PCin
-                display32bits = rf_write_data;
+                display32bits = rf_write_data_final;
             else if(switch[9:5]==5'b00111)
                 display32bits = mem_out_data;
             else if(switch[9:5]==5'b01000)
