@@ -18,7 +18,8 @@ module ctrl(
         output wire [1:0] ALUOp,
         output wire [1:0] ALUSrcB,
         output wire [1:0] PCSource,
-        output reg [3:0] state
+        output reg [3:0] state,
+        output wire RaWrite
     );
 
     wire [12:0] status;
@@ -60,7 +61,7 @@ module ctrl(
                             state <= BR_CPN;
                         6'b000101: //BNE
                             state <= BN_CPN;
-   						6'b000011: //Jal
+   						          6'b000011: //Jal
                             state <= JAL;
                         default:
                             state <= EX_R;
@@ -149,7 +150,7 @@ module ctrl(
     assign status[10]= (state==4'b1010);
     assign status[11]= (state==4'b1011);
     assign status[12]= (state==4'b1100);
-	assign status[13]= (state==4'b1101);
+	  assign status[13]= (state==4'b1101);
     assign status[14]= (state==4'b1110);
 
 
@@ -168,5 +169,6 @@ module ctrl(
     assign ALUOp = {status[6], status[8]};
     assign ALUSrcB = {status[1] | status[2] | status[11], status[0] | status[1]};
     assign PCSource = {status[9], status[8] | status[10]};
+    assign RaWrite = status[13];
 
 endmodule
