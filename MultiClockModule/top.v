@@ -15,11 +15,11 @@ module top (
 	wire btn_out_6ns;
 	wire btn_out_8ns;
 	pbdebounce pb0(clk,btn,btn_out);
-	assign #1 btn_out_1ns=btn_out;
-	assign #2 btn_out_2ns=btn_out;
-	assign #4 btn_out_4ns=btn_out;
-	assign #6 btn_out_6ns=btn_out;
-	assign #8 btn_out_8ns=btn_out;
+	//assign #1 btn_out_1ns=btn_out;
+	//assign #2 btn_out_2ns=btn_out;
+	//assign #4 btn_out_4ns=btn_out;
+	//assign #6 btn_out_6ns=btn_out;
+	//assign #8 btn_out_8ns=btn_out;
 	//Signals about the controller
 	wire ALUsrcA, RegWrite, RegDst,IRwrite,MemToReg, MemRead, MemWrite,IorD, PCwrite, PCWriteCond;
 	wire [1:0] PCsrc,ALUop, ALUsrcB;
